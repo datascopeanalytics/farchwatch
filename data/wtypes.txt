@@ -1,0 +1,17 @@
+01 = Fog, ice fog, or freezing fog (may include heavy fog) 02 = Heavy fog or heaving freezing fog (not always distinguished from fog) 
+03 = Thunder
+04 = Ice pellets, sleet, snow pellets, or small hail
+05 = Hail (may include small hail)
+06 = Glaze or rime
+07 = Dust, volcanic ash, blowing dust, blowing sand, or blowing obstruction 08 = Smoke or haze
+09 = Blowing or drifting snow
+10 = Tornado, waterspout, or funnel cloud 11 = High or damaging winds
+12 = Blowing spray
+13 = Mist
+14 = Drizzle
+15 = Freezing drizzle
+16 = Rain (may include freezing rain, drizzle, and freezing drizzle) 17 = Freezing rain
+18 = Snow, snow pellets, snow grains, or ice crystals
+19 = Unknown source of precipitation
+21 = Ground fog
+22 = Ice fog or freezing fog
