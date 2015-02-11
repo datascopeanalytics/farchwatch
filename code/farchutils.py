@@ -12,6 +12,7 @@ def get_df_from_csv():
     return df
 
 def faren(cel):
+    # temperatures stored in tenths of degrees C (hence /50 instead of /5 below)
     if pd.isnull(cel):
         return cel
     else:
