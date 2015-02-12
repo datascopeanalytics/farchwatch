@@ -12,3 +12,6 @@ exports.config =
       debug: 'comments'
     autoReload:
       enabled: true
+  modules:
+    wrapper: false
+    definition: false
