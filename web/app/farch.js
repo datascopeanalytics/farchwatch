@@ -10,6 +10,7 @@ var margin = {top:0, right: 0, bottom: 50, left: 40},
     x = d3.time.scale().domain([startDate,endDate]).range([0,width]);
     // years = d3.range(startYear, endYear);
 
+
 var viz = d3.select("#viz")
     .append("svg:svg")
     .attr("width", width + margin.left + margin.right)
@@ -28,14 +29,14 @@ queue()
     .defer(d3.json, "./when_it_be_over.json")
     .await(ready);
 
-function line(feat) { 
+function line(feat) {
     return d3.svg.line()
     .x(function(d) {
-	return x(dateme.invert(d.day));
+    return x(dateme.invert(d.day));
     })
     .y(function(d) {
-	tm = parseFloat(d[feat])
-	return y(tm);
+    tm = parseFloat(d[feat])
+    return y(tm);
     });
 };
 
@@ -56,6 +57,7 @@ viz.append('g')
     .attr("x", 6)
     .attr("y", 6);
 
+var key_div = d3.select('#yearlist');
 
 var buddy; // so's you can see the data in the console
 function ready(error, data, over) {
@@ -63,24 +65,44 @@ function ready(error, data, over) {
     data = d3.values(data);
     buddy = data;
 
+    var year_list = data.map(function(e) {
+        return e[0].year;
+    });
+    console.log(year_list);
+
     years = viz.selectAll('.year')
-	.data(data)
-	.enter().append('g')
-	.attr('class',function(d){ return 'year '+d[0].year})
+    .data(data)
+    .enter().append('g')
+    .attr('class',function(d){ return 'year '+d[0].year})
     years.append('path')
-	.attr('d',line('TMAX'))
-	.attr('class','tmax')
+    .attr('d',line('TMAX'))
+    .attr('class','tmax')
     years.append('path')
-	.attr('d',line('TMIN'))
-	.attr('class','tmin')
-	   
+    .attr('d',line('TMIN'))
+    .attr('class','tmin')
+
     viz.append('line')
-	.attr('id','line_of_salvation')
-	.attr('x1',x(startDate))
-	.attr('x2',x(endDate))
-	.attr('y1',y(60))
-	.attr('y2',y(60))
+    .attr('id','line_of_salvation')
+    .attr('x1',x(startDate))
+    .attr('x2',x(endDate))
+    .attr('y1',y(60))
+    .attr('y2',y(60))
+
+    // add years to scrollbox;
+    key_div.selectAll(".yearbox")
+        .data(year_list)
+        .enter().append('div')
+        .html(function(d){return d;})
+        .on("mouseenter", function(year, index) {
+            d3.select("." + year).classed('hovered-line',true);
+        })
+        .on("mouseleave", function(year, index) {
+            d3.select("." + year).classed('hovered-line',false);
+        })
+        .on("click", function(year, index) {
+            $(this).addClass('selected-box');
+            // TODO
+        })
 
 
-    
 }

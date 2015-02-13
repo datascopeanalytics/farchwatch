@@ -1,4 +1,15 @@
 $light-gray: #e0e0e0;
+.hovered-line > path {
+  &.tmax, &.tmin{
+    stroke: white;
+  }
+}
+.selected-line > path {
+  &.tmax, &.tmin {
+    stroke: red;
+  }
+}
+
 #title {
   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   font-weight: 900;
@@ -46,7 +57,7 @@ path.tmax {
 }
 path.tmin {
   fill:none;
-  stroke:lime;	
+  stroke:lime;
 }
 
 .axis text {
@@ -67,5 +78,5 @@ rect.background{
 
 line#line_of_salvation {
   stroke: cyan;
-  stroke-width: 5px;	
+  stroke-width: 5px;
 }
