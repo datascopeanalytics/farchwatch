@@ -56,12 +56,13 @@ viz.append('g')
     .attr("x", 6)
     .attr("y", 6);
 
-
+var whenit; 
 var buddy; // so's you can see the data in the console
 function ready(error, data, over) {
 
     data = d3.values(data);
     buddy = data;
+    whenit = over;
 
     years = viz.selectAll('.year')
 	.data(data)
