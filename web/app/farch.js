@@ -57,13 +57,17 @@ viz.append('g')
     .attr("x", 6)
     .attr("y", 6);
 
+
 var key_div = d3.select('#yearlist');
 
+
+var whenit;
 var buddy; // so's you can see the data in the console
 function ready(error, data, over) {
 
     data = d3.values(data);
     buddy = data;
+    whenit = over;
 
     var year_list = data.map(function(e) {
         return e[0].year;
