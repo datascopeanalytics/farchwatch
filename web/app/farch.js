@@ -1,5 +1,5 @@
 var margin = {top:0, right: 0, bottom: 50, left: 40},
-    width = 860 - margin.left - margin.right,
+    width = $("#viz").width() - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
     startDate = new Date(2015,0,1),
     endDate = new Date(2015,5,1),
