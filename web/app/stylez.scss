@@ -39,3 +39,33 @@ $light-gray: #e0e0e0;
   padding: 1em;
   background: $light-gray;
 }
+
+path.tmax {
+  fill:none;
+  stroke:magenta;
+}
+path.tmin {
+  fill:none;
+  stroke:lime;	
+}
+
+.axis text {
+  font: 18px sans-serif;
+  fill: cyan;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: magenta;
+  shape-rendering: crispEdges;
+}
+
+rect.background{
+  fill:blue;
+}
+
+line#line_of_salvation {
+  stroke: cyan;
+  stroke-width: 5px;	
+}
