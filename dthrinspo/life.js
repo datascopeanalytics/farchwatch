@@ -1,4 +1,4 @@
-
+//cribbed from http://projects.flowingdata.com/life-expectancy/
 var regions = {
         "SAS": "South Asia",
         "ECS": "Europe and Central Asia",
