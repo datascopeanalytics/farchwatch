@@ -96,6 +96,7 @@ function ready(error, data, over) {
     key_div.selectAll(".yearbox")
         .data(year_list)
         .enter().append('div')
+        .attr('class','key-year')
         .html(function(d){return d;})
         .on("mouseenter", function(year, index) {
             d3.select(".year-" + year).classed('hovered-line',true);

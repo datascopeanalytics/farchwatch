@@ -1,4 +1,8 @@
 $light-gray: #e0e0e0;
+body {
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+
 .hovered-line > path {
   &.tmax, &.tmin{
     stroke: white;
@@ -12,8 +16,19 @@ $light-gray: #e0e0e0;
 .selected-box {
   background: red;
 }
+#yearlist {
+  -moz-box-shadow:    inset 0 0 10px #000000;
+  -webkit-box-shadow: inset 0 0 10px #000000;
+  box-shadow:         inset 0 0 10px #000000;
+  overflow-y: scroll;
+  height: 350px;
+  .key-year {
+    font-size:1.6em;
+    font-size:2vw;
+    font-weight:bold;
+  }
+}
 #title {
-  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   font-weight: 900;
   color:#202020;
 
