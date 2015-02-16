@@ -9,7 +9,9 @@ $light-gray: #e0e0e0;
     stroke: red;
   }
 }
-
+.selected-box {
+  background: red;
+}
 #title {
   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   font-weight: 900;

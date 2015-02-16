@@ -75,15 +75,15 @@ function ready(error, data, over) {
     console.log(year_list);
 
     years = viz.selectAll('.year')
-    .data(data)
-    .enter().append('g')
-    .attr('class',function(d){ return 'year '+d[0].year})
+        .data(data)
+        .enter().append('g')
+        .attr('class',function(d){return 'year year-'+d[0].year})
     years.append('path')
-    .attr('d',line('TMAX'))
-    .attr('class','tmax')
+        .attr('d',line('TMAX'))
+        .attr('class','tmax')
     years.append('path')
-    .attr('d',line('TMIN'))
-    .attr('class','tmin')
+        .attr('d',line('TMIN'))
+        .attr('class','tmin')
 
     viz.append('line')
     .attr('id','line_of_salvation')
@@ -98,14 +98,18 @@ function ready(error, data, over) {
         .enter().append('div')
         .html(function(d){return d;})
         .on("mouseenter", function(year, index) {
-            d3.select("." + year).classed('hovered-line',true);
+            d3.select(".year-" + year).classed('hovered-line',true);
         })
         .on("mouseleave", function(year, index) {
-            d3.select("." + year).classed('hovered-line',false);
+            d3.select(".year-" + year).classed('hovered-line',false);
         })
         .on("click", function(year, index) {
-            $(this).addClass('selected-box');
+            $(this).toggleClass('selected-box');
             // TODO
+            var yearline = d3.select(".year-" + year);
+            // toggles the class depending on whether it's selected or not
+            yearline.classed('selected-line',
+                             !yearline.classed('selected-line'));
         })
 
 
