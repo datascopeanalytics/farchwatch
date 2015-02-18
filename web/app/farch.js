@@ -72,6 +72,7 @@ function ready(error, data, over) {
     var year_list = data.map(function(e) {
         return e[0].year;
     });
+    year_list.reverse();
     console.log(year_list);
 
     years = viz.selectAll('.year')
