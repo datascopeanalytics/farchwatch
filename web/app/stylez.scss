@@ -4,17 +4,11 @@ body {
 }
 
 .hovered-line > path {
-  &.tmax, &.tmin{
-    stroke: white;
+  &.temparea {
+    stroke:white;
+    stroke-width: 2px;
+
   }
-}
-.selected-line > path {
-  &.tmax, &.tmin {
-    stroke: red;
-  }
-}
-.selected-box {
-  background: red;
 }
 #yearlist {
   -moz-box-shadow:    inset 0 0 10px #000000;
@@ -69,32 +63,38 @@ body {
   background: $light-gray;
 }
 
-path.tmax {
-  fill:none;
-  stroke:magenta;
-}
-path.tmin {
-  fill:none;
-  stroke:lime;
+/* path.tmax { */
+/*   fill:none; */
+/*   stroke:rgba(255,255,255,.5); */
+/* } */
+/* path.tmin { */
+/*   fill:none; */
+/*   stroke:rgba(0,0,0,.5); */
+/* } */
+
+path.temparea {
+  fill: rgba(0,0,0,.15);
+
 }
 
 .axis text {
   font: 18px sans-serif;
-  fill: cyan;
+  fill: black;
 }
 
 .axis path,
 .axis line {
   fill: none;
-  stroke: magenta;
+  stroke: black;
   shape-rendering: crispEdges;
 }
 
 rect.background{
-  fill:blue;
+  fill: url(#temperature-gradient);
 }
 
 line#line_of_salvation {
-  stroke: cyan;
+  stroke: white;
   stroke-width: 5px;
+  stroke-dasharray: 10, 10;
 }
