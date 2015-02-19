@@ -11,7 +11,7 @@ body {
   &.temparea {
     stroke:white;
     stroke-width: 2px;
-  }   
+  }
 
 }
 
@@ -36,21 +36,29 @@ rect.hovered-over {
     font-weight:bold;
   }
 }
-#title {
+
+h1, h2, h3 {
   font-weight: 900;
   color:#202020;
-
-  font-size: 11vw;
   font-style: italic;
-
   text-transform:uppercase;
   line-height: 1em;
   letter-spacing: -.05em;
   font-kerning: normal;
 
-  position:relative;
-  top: -.15em;
+  &#title {
+    font-size: 11vw;
+    position:relative;
+    top: -.15em;
+  }
 }
+h2 {
+  font-size: 3.8em;
+}
+h3 {
+  font-size: 1.8em;
+}
+
 .light {
   color: $light-gray;
 }
@@ -184,5 +192,23 @@ $color5: lavender;
   &.color5 {
     background: $color5;
   }
+}
 
+#credits {
+  margin-top: 2em;
+  padding-top: .5em;
+  border-top: 2px solid black;
+  p {
+    font-size: 1.3em;
+  }
+  p:first-child {
+    font-weight:900;
+  }
+
+}
+#tagline-container {
+  text-align:center;
+  #tagline {
+    text-transform: lowercase;
+  }
 }
