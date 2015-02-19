@@ -1,4 +1,4 @@
-var margin = {top:0, right: 0, bottom: 50, left: 40},
+var margin = {top:20, right: 0, bottom: 50, left:40},
     width = $("#viz").width() - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
     startDate = new Date(2015,0,1),
@@ -6,7 +6,7 @@ var margin = {top:0, right: 0, bottom: 50, left: 40},
     // startAge = 20,
     // endAge = 80,
     y = d3.scale.linear().range([height,0]).domain([-30,100]),
-    dateme = d3.time.scale().domain([startDate,endDate]).range([1,152]),
+    dateme = d3.time.scale().domain([startDate,endDate]).range([1,121]),
     x = d3.time.scale().domain([startDate,endDate]).range([0,width]);
     // years = d3.range(startYear, endYear);
 
@@ -64,6 +64,12 @@ var xAxis = d3.svg.axis()
     .tickSize(16, 0)
     .tickFormat(d3.time.format("%B"));
 
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(8)
+    .outerTickSize(0)
+
 viz.append('g')
     .attr('class','x axis')
     .attr("transform", "translate(0," + height + ")")
@@ -73,6 +79,9 @@ viz.append('g')
     .attr("x", 6)
     .attr("y", 6);
 
+viz.append('g')
+    .attr('class','y axis')
+    .call(yAxis);
 
 var all_colors = ["color1","color2","color3","color4","color5"].reverse();
 var available_colors = all_colors.slice(0);
