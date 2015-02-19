@@ -1,4 +1,4 @@
-var margin = {top:20, right: 0, bottom: 50, left:40},
+var margin = {top:10, right: 0, bottom: 50, left:40},
     width = $("#viz").width() - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
     startDate = new Date(2015,0,1),
@@ -40,6 +40,7 @@ function line(feat) {
     });
 };
 
+
 // month axis http://bl.ocks.org/mbostock/1849162
 var xAxis = d3.svg.axis()
     .scale(x)
@@ -75,18 +76,62 @@ var whenit;
 var buddy; // so's you can see the data in the console
 function ready(error, data, over) {
 
-    data = d3.values(data);
+    data_array = d3.values(data);
     buddy = data;
+
+    // over = d3.entries(over)
+    // 	.map(function(d){
+    // 	    return {
+    // 		year:+d.key,
+    // 		over:new Date(d.value[1])
+    // 	    }
+    // 	});
     whenit = over;
 
-    var year_list = data.map(function(e) {
-        return e[0].year;
-    });
-    year_list.reverse();
-    console.log(year_list);
+    var year_list = d3.keys(data).map(function(d){return +d}).reverse()
+    // year_list.reverse();
+    // console.log(year_list);
+
+    function whenover(year){
+	tolerance = 0;
+	fuck = new Date(over[year+'.0'][tolerance]);
+	dateover = new Date(2015,fuck.getMonth(),fuck.getDay())
+	return dateover;
+    }
+
+    function hoveryear() {
+	year = $(this).data('year');
+	var hoverline = viz.selectAll('.hovered-line')
+	    .data([data[year+'.0']])
+	    .enter().append('g')
+	    .attr('class','hover hovered-line')
+	hoverline.append('path')
+	    .attr('d',line('TMAX'))
+	    .attr('class','tmax')
+	hoverline.append('path')
+	    .attr('d',line('TMIN'))
+	    .attr('class','tmin')
+	dateover = whenover(year);
+	// console.log(year)
+	// console.log(dateover)
+	viz.append('rect')
+	    .attr('x',x(dateover))
+	    .attr('y',0)
+	    .attr('width',width-x(dateover))
+	    .attr('height',height)
+	    .attr('class','hover hovered-over')
+
+    };
+
+    function unhoveryear() {
+	year = $(this).data('year');
+	viz.selectAll('.hover')
+	    .data([])
+	    .exit().remove()
+    };
 
     years = viz.selectAll('.year')
-        .data(data)
+        .data(data_array)
         .enter().append('g')
         .attr('class',function(d){return 'year year-'+d[0].year})
     years.append('path')
@@ -108,13 +153,10 @@ function ready(error, data, over) {
         .data(year_list)
         .enter().append('div')
         .attr('class','key-year')
+	.attr('data-year',function(d){return d;})
         .html(function(d){return d;})
-        .on("mouseenter", function(year, index) {
-            d3.select(".year-" + year).classed('hovered-line',true);
-        })
-        .on("mouseleave", function(year, index) {
-            d3.select(".year-" + year).classed('hovered-line',false);
-        })
+	.on('mouseenter',hoveryear)
+	.on('mouseleave',unhoveryear)
         .on("click", function(year, index) {
             $(this).toggleClass('selected-box');
             // TODO

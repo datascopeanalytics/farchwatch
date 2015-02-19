@@ -6,7 +6,13 @@ body {
 .hovered-line > path {
   &.tmax, &.tmin{
     stroke: white;
+    stroke-width:2px;
   }
+}
+
+rect.hovered-over {
+  fill: deepskyblue;
+  opacity: 0.4;
 }
 .selected-line > path {
   &.tmax, &.tmin {
@@ -71,11 +77,11 @@ body {
 
 path.tmax {
   fill:none;
-  stroke:magenta;
+  stroke:deeppink;
 }
 path.tmin {
   fill:none;
-  stroke:lime;
+  stroke:dodgerblue;
 }
 
 .axis text {
@@ -91,10 +97,12 @@ path.tmin {
 }
 
 rect.background{
-  fill:blue;
+  fill:dimgray;
+  opacity:0.5;
 }
 
 line#line_of_salvation {
   stroke: cyan;
-  stroke-width: 5px;
+  stroke-width: 2px;
+  stroke-dasharray: 5 3;
 }
