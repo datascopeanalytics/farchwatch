@@ -8,6 +8,11 @@ body {
     stroke: white;
     stroke-width:2px;
   }
+  &.temparea {
+    stroke:white;
+    stroke-width: 2px;
+  }   
+
 }
 
 rect.hovered-over {
@@ -18,9 +23,6 @@ rect.hovered-over {
   &.tmax, &.tmin {
     stroke: red;
   }
-}
-.selected-box {
-  background: red;
 }
 #yearlist {
   -moz-box-shadow:    inset 0 0 10px #000000;
@@ -75,6 +77,7 @@ rect.hovered-over {
   background: $light-gray;
 }
 
+
 path.tmax {
   fill:none;
   stroke:deeppink;
@@ -84,25 +87,102 @@ path.tmin {
   stroke:dodgerblue;
 }
 
+/* path.tmax { */
+/*   fill:none; */
+/*   stroke:rgba(255,255,255,.5); */
+/* } */
+/* path.tmin { */
+/*   fill:none; */
+/*   stroke:rgba(0,0,0,.5); */
+/* } */
+
+path.temparea {
+  fill: rgba(0,0,0,.15);
+}
+
 .axis text {
   font: 18px sans-serif;
-  fill: cyan;
+  fill: black;
 }
 
 .axis path,
 .axis line {
   fill: none;
-  stroke: magenta;
+  stroke: black;
   shape-rendering: crispEdges;
 }
 
+/* rect.background{ */
+/*   fill:dimgray; */
+/*   opacity:0.5; */
+/* } */
+
+/* line#line_of_salvation { */
+/*   stroke: cyan; */
+/*   stroke-width: 2px; */
+/*   stroke-dasharray: 5 3; */
+/* } */
+
 rect.background{
-  fill:dimgray;
-  opacity:0.5;
+  fill: url(#temperature-gradient);
 }
 
 line#line_of_salvation {
-  stroke: cyan;
-  stroke-width: 2px;
-  stroke-dasharray: 5 3;
+  stroke: white;
+  stroke-width: 5px;
+  stroke-dasharray: 10, 10;
+}
+
+$color1: fuchsia;
+$color2: lime;
+$color3: darkturquoise;
+$color4: peachpuff;
+$color5: lavender;
+
+.selected-line {
+  &.color1 {
+    > path {
+    stroke: $color1;
+    }
+  }
+  &.color2 {
+    > path {
+    stroke: $color2;
+    }
+  }
+  &.color3 {
+    stroke: $color3;
+  }
+  &.color4 {
+      stroke: $color4;
+  }
+  &.color5 {
+    stroke: $color5;
+  }
+
+  > path {
+    &.temparea {
+      stroke-width: 2px;
+    }
+  }
+}
+
+
+.selected-box {
+  &.color1 {
+    background: $color1;
+  }
+  &.color2 {
+    background: $color2;
+  }
+  &.color3 {
+    background: $color3;
+  }
+  &.color4 {
+    background: $color4;
+  }
+  &.color5 {
+    background: $color5;
+  }
+
 }

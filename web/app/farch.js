@@ -31,14 +31,30 @@ queue()
 
 function line(feat) {
     return d3.svg.line()
-    .x(function(d) {
-    return x(dateme.invert(d.day));
-    })
-    .y(function(d) {
-    tm = parseFloat(d[feat])
-    return y(tm);
-    });
+        .x(function(d) {
+            return x(dateme.invert(d.day));
+        })
+        .y(function(d) {
+            tm = parseFloat(d[feat])
+            return y(tm);
+        });
 };
+function area() {
+    return d3.svg.area()
+        .x(function(d) {
+            return x(dateme.invert(d.day));
+        })
+        .y0(function(d) {
+            tm = parseFloat(d["TMAX"])
+            return y(tm);
+        })
+        .y1(function(d) {
+            tm = parseFloat(d["TMIN"])
+            return y(tm);
+        });
+
+
+}
 
 
 // month axis http://bl.ocks.org/mbostock/1849162
@@ -68,10 +84,12 @@ viz.append('g')
     .attr('class','y axis')
     .call(yAxis);
 
+var all_colors = ["color1","color2","color3","color4","color5"].reverse();
+var available_colors = all_colors.slice(0);
 
 var key_div = d3.select('#yearlist');
 
-
+var num_selected = 0;
 var whenit;
 var buddy; // so's you can see the data in the console
 function ready(error, data, over) {
@@ -133,20 +151,24 @@ function ready(error, data, over) {
     years = viz.selectAll('.year')
         .data(data_array)
         .enter().append('g')
-        .attr('class',function(d){return 'year year-'+d[0].year})
+        .attr('class',function(d){return 'year year-'+d[0].year});
     years.append('path')
-        .attr('d',line('TMAX'))
-        .attr('class','tmax')
-    years.append('path')
-        .attr('d',line('TMIN'))
-        .attr('class','tmin')
+        .attr('d',area())
+        .attr('class','temparea');
+
+    // years.append('path')
+    //     .attr('d',line('TMAX'))
+    //     .attr('class','tmax')
+    // years.append('path')
+    //     .attr('d',line('TMIN'))
+    //     .attr('class','tmin')
 
     viz.append('line')
-    .attr('id','line_of_salvation')
-    .attr('x1',x(startDate))
-    .attr('x2',x(endDate))
-    .attr('y1',y(60))
-    .attr('y2',y(60))
+        .attr('id','line_of_salvation')
+        .attr('x1',x(startDate))
+        .attr('x2',x(endDate))
+        .attr('y1',y(60))
+        .attr('y2',y(60));
 
     // add years to scrollbox;
     key_div.selectAll(".yearbox")
@@ -158,15 +180,76 @@ function ready(error, data, over) {
 	.on('mouseenter',hoveryear)
 	.on('mouseleave',unhoveryear)
         .on("click", function(year, index) {
-            $(this).toggleClass('selected-box');
-            // TODO
-            var yearline = d3.select(".year-" + year);
-            // toggles the class depending on whether it's selected or not
-            yearline.classed('selected-line',
-                             !yearline.classed('selected-line'));
+            if($(this).hasClass('selected-box')) {
+                num_selected -= 1;
+            }
+            else {
+                num_selected += 1;
+            }
+            if(num_selected <= 5) {
+                var lineclass = ".year-" + year;
+
+                console.log(d3.select(this));
+
+                if($(this).hasClass('selected-box')) {
+                    console.log('remove color');
+                    recycleColor(this, lineclass);
+                }
+                else {
+                    console.log('add color');
+                    addUniqueColor(this, lineclass);
+                }
+
+                $(this).toggleClass('selected-box');
+                // toggles the class depending on whether it's selected or not
+
+                var yearline = d3.select(lineclass);
+                yearline.classed('selected-line',
+                                 !yearline.classed('selected-line'));
+            }
+            else {
+                num_selected -= 1;
+                alert('Cut it out, Captain Clickhappy. '+
+                      'You can only select 5 years at a time.');
+            }
+            console.log('selected', num_selected);
+
         })
 
-    
+    makeGradient();
+}
 
+function addUniqueColor(box, line) {
+    var color = available_colors.pop();
+    d3.select(box).classed(color, true);
+    d3.select(line).classed(color, true);
+}
+function recycleColor(box, line) {
+    for(var i=0; i<all_colors.length; i++) {
+        if(d3.select(box).classed(all_colors[i])){
+            d3.select(box).classed(all_colors[i], false);
+            d3.select(line).classed(all_colors[i], false);
+            available_colors.push(all_colors[i]);
+        }
+    }
+}
+
+function makeGradient() {
+     viz.append("linearGradient")
+      .attr("id", "temperature-gradient")
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", 0).attr("y1", y(-30))
+      .attr("x2", 0).attr("y2", y(100))
+    .selectAll("stop")
+      .data([
+          {offset: "0%", color: "black"},
+          {offset: "30%", color: "#6060ff"},
+          {offset: "60%", color: "#dddddd"},
+          {offset: "70%", color: "#ffff20"},
+          {offset: "100%", color: "red"}
+      ])
+    .enter().append("stop")
+      .attr("offset", function(d) { return d.offset; })
+      .attr("stop-color", function(d) { return d.color; });
 
 }
