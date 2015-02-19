@@ -98,3 +98,57 @@ line#line_of_salvation {
   stroke-width: 5px;
   stroke-dasharray: 10, 10;
 }
+
+$color1: fuchsia;
+$color2: lime;
+$color3: darkturquoise;
+$color4: peachpuff;
+$color5: lavender;
+
+.selected-line {
+  &.color1 {
+    > path {
+    stroke: $color1;
+    }
+  }
+  &.color2 {
+    > path {
+    stroke: $color2;
+    }
+  }
+  &.color3 {
+    stroke: $color3;
+  }
+  &.color4 {
+      stroke: $color4;
+  }
+  &.color5 {
+    stroke: $color5;
+  }
+
+  > path {
+    &.temparea {
+      stroke-width: 2px;
+    }
+  }
+}
+
+
+.selected-box {
+  &.color1 {
+    background: $color1;
+  }
+  &.color2 {
+    background: $color2;
+  }
+  &.color3 {
+    background: $color3;
+  }
+  &.color4 {
+    background: $color4;
+  }
+  &.color5 {
+    background: $color5;
+  }
+
+}

@@ -74,9 +74,12 @@ viz.append('g')
     .attr("y", 6);
 
 
+var all_colors = ["color1","color2","color3","color4","color5"].reverse();
+var available_colors = all_colors.slice(0);
+
 var key_div = d3.select('#yearlist');
 
-
+var num_selected = 0;
 var whenit;
 var buddy; // so's you can see the data in the console
 function ready(error, data, over) {
@@ -126,12 +129,40 @@ function ready(error, data, over) {
             d3.select(".year-" + year).classed('hovered-line',false);
         })
         .on("click", function(year, index) {
-            $(this).toggleClass('selected-box');
-            // TODO
-            var yearline = d3.select(".year-" + year);
-            // toggles the class depending on whether it's selected or not
-            yearline.classed('selected-line',
-                             !yearline.classed('selected-line'));
+            if($(this).hasClass('selected-box')) {
+                num_selected -= 1;
+            }
+            else {
+                num_selected += 1;
+            }
+            if(num_selected <= 5) {
+                var lineclass = ".year-" + year;
+
+                console.log(d3.select(this));
+
+                if($(this).hasClass('selected-box')) {
+                    console.log('remove color');
+                    recycleColor(this, lineclass);
+                }
+                else {
+                    console.log('add color');
+                    addUniqueColor(this, lineclass);
+                }
+
+                $(this).toggleClass('selected-box');
+                // toggles the class depending on whether it's selected or not
+
+                var yearline = d3.select(lineclass);
+                yearline.classed('selected-line',
+                                 !yearline.classed('selected-line'));
+            }
+            else {
+                num_selected -= 1;
+                alert('Cut it out, Captain Clickhappy. '+
+                      'You can only select 5 years at a time.');
+            }
+            console.log('selected', num_selected);
+
         })
 
     makeGradient();
