@@ -2,3 +2,6 @@
 #*
 *.pyc
 data_out*/*
+code/data_out_*/*
+*/*.pyc
+code/*.pyc
