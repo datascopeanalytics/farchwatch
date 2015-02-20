@@ -79,7 +79,7 @@ def nans_to_zeroes(df):
     legitimacy of doing this: Medium-Meh to Meh.
     '''
     for col in ['SNOW','FOG','MIST','RAIN','HAZE']:
-        df.loc[:,col].replace(np.NaN,0)
+        df.loc[:,col]=df.loc[:,col].replace(np.NaN,0)
 
     return df
 

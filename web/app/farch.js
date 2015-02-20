@@ -96,14 +96,6 @@ function ready(error, data, over) {
 
     data_array = d3.values(data);
     buddy = data;
-
-    // over = d3.entries(over)
-    // 	.map(function(d){
-    // 	    return {
-    // 		year:+d.key,
-    // 		over:new Date(d.value[1])
-    // 	    }
-    // 	});
     whenit = over;
 
     var year_list = d3.keys(data).map(function(d){return +d}).reverse()
@@ -111,16 +103,18 @@ function ready(error, data, over) {
     // console.log(year_list);
 
     function whenover(year){
-	tolerance = 0;
-	fuck = new Date(over[year+'.0'][tolerance]);
+	tolerance = 1;
+	fuck = new Date(over[year][tolerance]);
 	dateover = new Date(2015,fuck.getMonth(),fuck.getDay())
 	return dateover;
     }
 
     function hoveryear() {
 	year = $(this).data('year');
+	console.log(this)
+	console.log(year,typeof(year))
 	var hoverline = viz.selectAll('.hovered-line')
-	    .data([data[year+'.0']])
+	    .data([data[year]])
 	    .enter().append('g')
 	    .attr('class','hover hovered-line')
 	hoverline.append('path')
@@ -155,13 +149,6 @@ function ready(error, data, over) {
     years.append('path')
         .attr('d',area())
         .attr('class','temparea');
-
-    // years.append('path')
-    //     .attr('d',line('TMAX'))
-    //     .attr('class','tmax')
-    // years.append('path')
-    //     .attr('d',line('TMIN'))
-    //     .attr('class','tmin')
 
     viz.append('line')
         .attr('id','line_of_salvation')
