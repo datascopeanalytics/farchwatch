@@ -6,7 +6,7 @@ var margin = {top:10, right: 0, bottom: 50, left:40},
     // startAge = 20,
     // endAge = 80,
     y = d3.scale.linear().range([height,0]).domain([-30,100]),
-    dateme = d3.time.scale().domain([startDate,endDate]).range([1,121]),
+    dateme = d3.time.scale().domain([startDate,endDate]).range([1,151]),
     x = d3.time.scale().domain([startDate,endDate]).range([0,width]);
     // years = d3.range(startYear, endYear);
 
@@ -27,6 +27,7 @@ viz.append('rect')
 queue()
     .defer(d3.json, "./data_by_year.json")
     .defer(d3.json, "./when_it_be_over.json")
+    .defer(d3.json, "./daily_averages.json")
     .await(ready);
 
 function line(feat) {
@@ -92,11 +93,13 @@ var key_div = d3.select('#yearlist');
 var num_selected = 0;
 var whenit;
 var buddy; // so's you can see the data in the console
-function ready(error, data, over) {
+var dailies;
+function ready(error, data, over, averages) {
 
     data_array = d3.values(data);
     buddy = data;
     whenit = over;
+    dailies = averages;
 
     var year_list = d3.keys(data).map(function(d){return +d}).reverse()
     // year_list.reverse();
@@ -111,8 +114,6 @@ function ready(error, data, over) {
 
     function hoveryear() {
 	year = $(this).data('year');
-	console.log(this)
-	console.log(year,typeof(year))
 	var hoverline = viz.selectAll('.hovered-line')
 	    .data([data[year]])
 	    .enter().append('g')
