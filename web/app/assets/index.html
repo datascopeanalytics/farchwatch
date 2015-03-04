@@ -24,6 +24,8 @@
       ga('send', 'pageview');
 
     </script>
+    <!-- Firebase -->
+    <script src='https://cdn.firebase.com/js/client/2.0.4/firebase.js'></script>
 
     <!-- D3 and Queue (BOSTOCK BLOCK) -->
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
@@ -62,8 +64,8 @@
         </div>
         <div class="col-md-3" style="border:5px solid lightgray">
           <h3>You look like you have something to say.</h3>
-          <textarea></textarea>
-          <button>As a matter of fact, I do</button>
+          <textarea id="comment"></textarea>
+          <button id="comment-submit" class="btn btn-lg btn-block">As a matter of fact, I do</button>
         </div>
       </div>
       <div class="row">
