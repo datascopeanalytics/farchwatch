@@ -167,43 +167,24 @@ function ready(error, data, over, averages) {
         .attr('class','key-year')
     .attr('data-year',function(d){return d;})
         .html(function(d){return d;})
-    .on('mouseenter',hoveryear)
-    .on('mouseleave',unhoveryear)
+        .on('mouseenter',hoveryear)
+        .on('mouseleave',unhoveryear)
         .on("click", function(year, index) {
-            if($(this).hasClass('selected-box')) {
-                num_selected -= 1;
+            // if the user is just clicking on the already selected
+            // thing, they want to deselect it.
+            var toggle = $(this).hasClass('selected-box');
+
+            // regardless, remove any existing selected classes
+            $('.selected-box').removeClass('selected-box');
+            $('.selected-line').removeClass('selected-line');
+
+            if(!toggle) {
+                // add class to this box
+                $(this).addClass('selected-box');
+
+                // add class to correct line
+
             }
-            else {
-                num_selected += 1;
-            }
-            if(num_selected <= 5) {
-                var lineclass = ".year-" + year;
-
-                console.log(d3.select(this));
-
-                if($(this).hasClass('selected-box')) {
-                    console.log('remove color');
-                    recycleColor(this, lineclass);
-                }
-                else {
-                    console.log('add color');
-                    addUniqueColor(this, lineclass);
-                }
-
-                $(this).toggleClass('selected-box');
-                // toggles the class depending on whether it's selected or not
-
-                var yearline = d3.select(lineclass);
-                yearline.classed('selected-line',
-                                 !yearline.classed('selected-line'));
-            }
-            else {
-                num_selected -= 1;
-                alert('Cut it out, Captain Clickhappy. '+
-                      'You can only select 5 years at a time.');
-            }
-            console.log('selected', num_selected);
-
         })
 
     makeGradient();
@@ -213,6 +194,7 @@ function ready(error, data, over, averages) {
 
 function addUniqueColor(box, line) {
     var color = available_colors.pop();
+
     d3.select(box).classed(color, true);
     d3.select(line).classed(color, true);
 }
