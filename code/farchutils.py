@@ -160,7 +160,8 @@ def create_df_by_date():
 def dict_me(df):
     return nans_to_nulls(df).reset_index().to_dict('records')
 
-def create_yearly_dict_from_df(df):
+def create_yearly_dict_from_df(df1):
+    df = df1.copy()
     stupid_data_dict = dict_me(df)
 
     data_dict = {}
@@ -205,8 +206,10 @@ def when_is_it_over(yearly_dict,tolerance):
 
     
 def add_nice_and_over(df,nice,not_over,tol):
+
     df.loc[:,'is_nice'] = (df.loc[:,'TMAX'] > nice) & (df.loc[:,'PRCP'] < 10)
     df.loc[:,'not_over'] = df.loc[:,'TMAX'] < not_over
+    print '3. TMAX dtype',df.TMAX.dtype
 
     return df
 
@@ -227,11 +230,14 @@ if __name__ == '__main__':
     TOLERANCE = 1
     ##
     df_with_nice_and_over = add_nice_and_over(df_by_date,NICE,NOT_OVER,TOLERANCE)
+    print '1. TMAX dtype',df_with_nice_and_over.TMAX.dtype
 
     # data json 1: data_by_year.json
     yearly_dict = create_yearly_dict_from_df(df_with_nice_and_over)
+    print '5. TMAX dtype',df_with_nice_and_over.TMAX.dtype
     with open(dirname+'/data_by_year.json','w') as outfile1:
         json.dump(yearly_dict,outfile1)
+    print '4. TMAX dtype',df_with_nice_and_over.TMAX.dtype
 
     # data json 2: when_it_be_over.json
     over_dict = when_is_it_over(yearly_dict,TOLERANCE)
@@ -244,9 +250,13 @@ if __name__ == '__main__':
         json.dump(over_dict,outfile2)
     
     # data json 3: daily_averages.json
-    daily_averages_df = df_by_date.groupby(df_with_nice_and_over.day).mean()
-    daily_averages_df = nans_to_nulls(daily_averages_df)
+
+
+    print '2. TMAX dtype',df_with_nice_and_over.TMAX.dtype
+    daily_averages_df = df_with_nice_and_over.groupby('day').mean()
+    print daily_averages_df.head()
     daily_averages = dict_me(daily_averages_df)
+    print daily_averages[:5]
     with open (dirname+'/daily_averages.json','w') as outfile3:
         json.dump(daily_averages,outfile3)
 
