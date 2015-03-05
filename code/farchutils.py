@@ -1,14 +1,33 @@
+#!/usr/local/bin/python
+import os
+import sys
 import json
 from datetime import datetime
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
 
-DATA_CSV = './data/468104.csv'
+DATA_CSV = '../data/468104.csv'
+
+COLUMNS = [
+    'STATION_NAME',
+    'DATE', 
+    'PRCP', 
+    'SNOW', 
+    'TMAX', 
+    'TMIN', 
+    'AWND', 
+    'WT01', 
+    'WT13', 
+    'WT16', 
+    'WT08',
+]
+
 
 def get_df_from_csv():
     nan_values = ['-9999','9999']
-    df = pd.read_csv(DATA_CSV, na_values = nan_values, parse_dates=True)
+    df = pd.read_csv(DATA_CSV, na_values = nan_values, parse_dates=True,low_memory=False)
     return df
 
 def faren(cel):
@@ -22,25 +41,57 @@ def day_of_year(dt):
     return int(datetime.strftime(dt,'%j'))
 
 def make_dates_dates(df):
-    df.DATE = pd.to_datetime(df.DATE.map(lambda x:str(x)),format="%Y%m%d")
+    awful_thing = df['DATE'].astype(str)
+    df.loc[:,'DATE'] = pd.to_datetime(awful_thing,format="%Y%m%d")
     return df
 
 def convert_to_farenheit(df):
     
-    df['TMAX'] = df.TMAX.map(faren)
-    df['TMIN'] = df.TMIN.map(faren)
+    df.loc[:,'TMAX'] = df.loc[:,'TMAX'].map(faren)
+    df.loc[:,'TMIN'] = df.loc[:,'TMIN'].map(faren)
     return df
     
 def add_date_cols(df):    
-    df['year'] = df['DATE'].map(lambda x:x.year)
-    df['month'] = df['DATE'].map(lambda x:x.month)
-    df['day'] = df['DATE'].map(day_of_year)
+    df.loc[:,'year'] = df.loc[:,'DATE'].map(lambda x:x.year)
+    df.loc[:,'month'] = df.loc[:,'DATE'].map(lambda x:x.month)
+    df.loc[:,'day'] = df.loc[:,'DATE'].map(day_of_year)
+
+    return df
+
+def remove_botanical_garden(df):
+    stations = df.STATION_NAME.unique()
+    return df[df.loc[:,'STATION_NAME'] != stations[2]]
+
+def make_cols_human_readable(df):
+    df.rename(columns = {
+        'WT01': 'FOG',
+        'WT13':'MIST',
+        'WT16':'RAIN',
+        'WT08':'HAZE'
+    }, inplace=True)
+    return df
+
+def nans_to_zeroes(df):
+    '''
+    specific to these columns, 
+    replacing NaNs with zeroes 
+    for the purpose of making averages quickly and lazily 
+    legitimacy of doing this: Medium-Meh to Meh.
+    '''
+    for col in ['SNOW','FOG','MIST','RAIN','HAZE']:
+        df.loc[:,col]=df.loc[:,col].replace(np.NaN,0)
 
     return df
 
 def clean_dataframe(df,columns):
+    df = make_dates_dates(df.loc[:,columns])
+    df = convert_to_farenheit(df)
+    df = add_date_cols(df)
+    df = remove_botanical_garden(df)
+    df = make_cols_human_readable(df)
+    df = nans_to_zeroes(df)
 
-     return add_date_cols(convert_to_farenheit(make_dates_dates(df[columns])))
+    return df
     
 
 def create_column_defs():
@@ -91,3 +142,125 @@ def create_column_defs():
         json.dump(column_key,outfile)
 
     return column_key
+
+def nans_to_nulls(df):
+    '''
+    to entire dataframe, 
+    changing one convention of saying 'nothing' to another,
+    for the purpose of creating valid JSON
+    legitimacy: V. Legit.
+    '''
+    df.loc[:,:] = df.where(pd.notnull(df),None)
+    return df
+
+def create_df_by_date():
+    df = clean_dataframe(get_df_from_csv(),COLUMNS)
+    return df.groupby(['DATE']).mean()
+
+def dict_me(df):
+    return nans_to_nulls(df).reset_index().to_dict('records')
+
+def create_yearly_dict_from_df(df1):
+    df = df1.copy()
+    stupid_data_dict = dict_me(df)
+
+    data_dict = {}
+    for record in stupid_data_dict: 
+        date = str(record['DATE']).split()[0]
+        record['DATE'] = date
+        data_dict[date]=record
+    
+    # dby: data_by_year
+    dby = defaultdict(list)
+    for record in data_dict.itervalues():
+        y = record['year']
+        dby[y].append(record)
+
+    # sort days within each year
+    for key,val in dby.iteritems():
+        val.sort(key=lambda x: x['DATE'])    
+        
+    return dby
+
+
+def when_is_it_over(yearly_dict,tolerance):
+    # figuring out when it is over each year
+    over_dict=defaultdict(dict)
+
+    for year, stuff in yearly_dict.items():
+
+        number_bummers = 0
+        over_date = None
+        for day in reversed(stuff):
+            if number_bummers <= tolerance:
+                if day['not_over']:
+                    over_dict[year][number_bummers] = over_date
+                    number_bummers += 1
+                if day['is_nice']:
+                    over_date = day['DATE']
+
+            else:
+                break
+
+    return dict(over_dict)
+
+    
+def add_nice_and_over(df,nice,not_over,tol):
+
+    df.loc[:,'is_nice'] = (df.loc[:,'TMAX'] > nice) & (df.loc[:,'PRCP'] < 10)
+    df.loc[:,'not_over'] = df.loc[:,'TMAX'] < not_over
+    print '3. TMAX dtype',df.TMAX.dtype
+
+    return df
+
+if __name__ == '__main__':
+
+    # make a dirrrrrr for the da-duh
+    dirname = 'data_out_'+datetime.strftime(datetime.now(),'%Y%m%d_%I%M') 
+    os.mkdir(dirname)
+
+    df_by_date = create_df_by_date()
+
+    #### SET RULES FOR "OVER" 
+    # once a daily high hits [NICE] degrees with no PRCP, "it is over" if, 
+    # after that day, the high is below [NOT_OVER] degrees 
+    # [TOLERANCE >= 0] times or fewer.
+    NICE = 60 
+    NOT_OVER = 50
+    TOLERANCE = 1
+    ##
+    df_with_nice_and_over = add_nice_and_over(df_by_date,NICE,NOT_OVER,TOLERANCE)
+    print '1. TMAX dtype',df_with_nice_and_over.TMAX.dtype
+
+    # data json 1: data_by_year.json
+    yearly_dict = create_yearly_dict_from_df(df_with_nice_and_over)
+    print '5. TMAX dtype',df_with_nice_and_over.TMAX.dtype
+    with open(dirname+'/data_by_year.json','w') as outfile1:
+        json.dump(yearly_dict,outfile1)
+    print '4. TMAX dtype',df_with_nice_and_over.TMAX.dtype
+
+    # data json 2: when_it_be_over.json
+    over_dict = when_is_it_over(yearly_dict,TOLERANCE)
+    over_dict['metadata']={
+        'NICE':NICE,
+        'NOT_OVER':NOT_OVER,
+        'TOLERANCE':TOLERANCE,
+    }
+    with open(dirname+'/when_it_be_over.json','w') as outfile2:
+        json.dump(over_dict,outfile2)
+    
+    # data json 3: daily_averages.json
+
+
+    print '2. TMAX dtype',df_with_nice_and_over.TMAX.dtype
+    daily_averages_df = df_with_nice_and_over.groupby('day').mean()
+    print daily_averages_df.head()
+    daily_averages = dict_me(daily_averages_df)
+    print daily_averages[:5]
+    with open (dirname+'/daily_averages.json','w') as outfile3:
+        json.dump(daily_averages,outfile3)
+
+
+
+   
+

@@ -1,4 +1,6 @@
-var margin = {top:20, right: 0, bottom: 50, left:40},
+Firebase.goOffline();
+
+var margin = {top:10, right: 0, bottom: 50, left:40},
     width = $("#viz").width() - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
     startDate = new Date(2015,0,1),
@@ -6,7 +8,7 @@ var margin = {top:20, right: 0, bottom: 50, left:40},
     // startAge = 20,
     // endAge = 80,
     y = d3.scale.linear().range([height,0]).domain([-30,100]),
-    dateme = d3.time.scale().domain([startDate,endDate]).range([1,121]),
+    dateme = d3.time.scale().domain([startDate,endDate]).range([1,151]),
     x = d3.time.scale().domain([startDate,endDate]).range([0,width]);
     // years = d3.range(startYear, endYear);
 
@@ -27,6 +29,7 @@ viz.append('rect')
 queue()
     .defer(d3.json, "./data_by_year.json")
     .defer(d3.json, "./when_it_be_over.json")
+    .defer(d3.json, "./daily_averages.json")
     .await(ready);
 
 function line(feat) {
@@ -55,6 +58,7 @@ function area() {
 
 
 }
+
 
 // month axis http://bl.ocks.org/mbostock/1849162
 var xAxis = d3.svg.axis()
@@ -91,32 +95,63 @@ var key_div = d3.select('#yearlist');
 var num_selected = 0;
 var whenit;
 var buddy; // so's you can see the data in the console
-function ready(error, data, over) {
+var dailies;
+function ready(error, data, over, averages) {
 
-    data = d3.values(data);
+    data_array = d3.values(data);
     buddy = data;
     whenit = over;
+    dailies = averages;
 
-    var year_list = data.map(function(e) {
-        return e[0].year;
-    });
-    year_list.reverse();
-    console.log(year_list);
+    var year_list = d3.keys(data).map(function(d){return +d}).reverse()
+    // year_list.reverse();
+    // console.log(year_list);
+
+    function whenover(year){
+    tolerance = 1;
+    fuck = new Date(over[year][tolerance]);
+    dateover = new Date(2015,fuck.getMonth(),fuck.getDay())
+    return dateover;
+    }
+
+    function hoveryear() {
+    year = $(this).data('year');
+    var hoverline = viz.selectAll('.hovered-line')
+        .data([data[year]])
+        .enter().append('g')
+        .attr('class','hover hovered-line')
+    hoverline.append('path')
+        .attr('d',line('TMAX'))
+        .attr('class','tmax')
+    hoverline.append('path')
+        .attr('d',line('TMIN'))
+        .attr('class','tmin')
+    dateover = whenover(year);
+    // console.log(year)
+    // console.log(dateover)
+    viz.append('rect')
+        .attr('x',x(dateover))
+        .attr('y',0)
+        .attr('width',width-x(dateover))
+        .attr('height',height)
+        .attr('class','hover hovered-over')
+
+    };
+
+    function unhoveryear() {
+    year = $(this).data('year');
+    viz.selectAll('.hover')
+        .data([])
+        .exit().remove()
+    };
 
     years = viz.selectAll('.year')
-        .data(data)
+        .data(data_array)
         .enter().append('g')
         .attr('class',function(d){return 'year year-'+d[0].year});
     years.append('path')
         .attr('d',area())
         .attr('class','temparea');
-
-    // years.append('path')
-    //     .attr('d',line('TMAX'))
-    //     .attr('class','tmax')
-    // years.append('path')
-    //     .attr('d',line('TMIN'))
-    //     .attr('class','tmin')
 
     viz.append('line')
         .attr('id','line_of_salvation')
@@ -130,13 +165,10 @@ function ready(error, data, over) {
         .data(year_list)
         .enter().append('div')
         .attr('class','key-year')
+    .attr('data-year',function(d){return d;})
         .html(function(d){return d;})
-        .on("mouseenter", function(year, index) {
-            d3.select(".year-" + year).classed('hovered-line',true);
-        })
-        .on("mouseleave", function(year, index) {
-            d3.select(".year-" + year).classed('hovered-line',false);
-        })
+    .on('mouseenter',hoveryear)
+    .on('mouseleave',unhoveryear)
         .on("click", function(year, index) {
             if($(this).hasClass('selected-box')) {
                 num_selected -= 1;
@@ -175,6 +207,8 @@ function ready(error, data, over) {
         })
 
     makeGradient();
+
+    $('#comment-submit').on('click', postComment);
 }
 
 function addUniqueColor(box, line) {
@@ -210,4 +244,15 @@ function makeGradient() {
       .attr("offset", function(d) { return d.offset; })
       .attr("stop-color", function(d) { return d.color; });
 
+}
+
+function postComment() {
+    Firebase.goOnline();
+    var commentBox = $("#comment");
+    var fb = new Firebase("https://boiling-fire-9934.firebaseio.com/");
+    comments = fb.child("comments");
+    comments.push({"message":commentBox.val()})
+
+    commentBox.val("");
+    alert("Cool. We'll maybe read that at some point.")
 }
