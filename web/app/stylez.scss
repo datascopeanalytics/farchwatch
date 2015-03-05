@@ -212,3 +212,14 @@ $color5: lavender;
     text-transform: lowercase;
   }
 }
+
+textarea {
+  width:100%;
+}
+#comment-submit {
+  color: white;
+  font-weight: bold;
+  background-color: black;
+  border-radius: 0px;
+  margin-bottom: 1em;
+}

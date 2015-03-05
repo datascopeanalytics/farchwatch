@@ -1,3 +1,5 @@
+Firebase.goOffline();
+
 var margin = {top:10, right: 0, bottom: 50, left:40},
     width = $("#viz").width() - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
@@ -106,41 +108,41 @@ function ready(error, data, over, averages) {
     // console.log(year_list);
 
     function whenover(year){
-	tolerance = 1;
-	fuck = new Date(over[year][tolerance]);
-	dateover = new Date(2015,fuck.getMonth(),fuck.getDay())
-	return dateover;
+    tolerance = 1;
+    fuck = new Date(over[year][tolerance]);
+    dateover = new Date(2015,fuck.getMonth(),fuck.getDay())
+    return dateover;
     }
 
     function hoveryear() {
-	year = $(this).data('year');
-	var hoverline = viz.selectAll('.hovered-line')
-	    .data([data[year]])
-	    .enter().append('g')
-	    .attr('class','hover hovered-line')
-	hoverline.append('path')
-	    .attr('d',line('TMAX'))
-	    .attr('class','tmax')
-	hoverline.append('path')
-	    .attr('d',line('TMIN'))
-	    .attr('class','tmin')
-	dateover = whenover(year);
-	// console.log(year)
-	// console.log(dateover)
-	viz.append('rect')
-	    .attr('x',x(dateover))
-	    .attr('y',0)
-	    .attr('width',width-x(dateover))
-	    .attr('height',height)
-	    .attr('class','hover hovered-over')
+    year = $(this).data('year');
+    var hoverline = viz.selectAll('.hovered-line')
+        .data([data[year]])
+        .enter().append('g')
+        .attr('class','hover hovered-line')
+    hoverline.append('path')
+        .attr('d',line('TMAX'))
+        .attr('class','tmax')
+    hoverline.append('path')
+        .attr('d',line('TMIN'))
+        .attr('class','tmin')
+    dateover = whenover(year);
+    // console.log(year)
+    // console.log(dateover)
+    viz.append('rect')
+        .attr('x',x(dateover))
+        .attr('y',0)
+        .attr('width',width-x(dateover))
+        .attr('height',height)
+        .attr('class','hover hovered-over')
 
     };
 
     function unhoveryear() {
-	year = $(this).data('year');
-	viz.selectAll('.hover')
-	    .data([])
-	    .exit().remove()
+    year = $(this).data('year');
+    viz.selectAll('.hover')
+        .data([])
+        .exit().remove()
     };
 
     years = viz.selectAll('.year')
@@ -163,10 +165,10 @@ function ready(error, data, over, averages) {
         .data(year_list)
         .enter().append('div')
         .attr('class','key-year')
-	.attr('data-year',function(d){return d;})
+    .attr('data-year',function(d){return d;})
         .html(function(d){return d;})
-	.on('mouseenter',hoveryear)
-	.on('mouseleave',unhoveryear)
+    .on('mouseenter',hoveryear)
+    .on('mouseleave',unhoveryear)
         .on("click", function(year, index) {
             if($(this).hasClass('selected-box')) {
                 num_selected -= 1;
@@ -205,6 +207,8 @@ function ready(error, data, over, averages) {
         })
 
     makeGradient();
+
+    $('#comment-submit').on('click', postComment);
 }
 
 function addUniqueColor(box, line) {
@@ -240,4 +244,15 @@ function makeGradient() {
       .attr("offset", function(d) { return d.offset; })
       .attr("stop-color", function(d) { return d.color; });
 
+}
+
+function postComment() {
+    Firebase.goOnline();
+    var commentBox = $("#comment");
+    var fb = new Firebase("https://boiling-fire-9934.firebaseio.com/");
+    comments = fb.child("comments");
+    comments.push({"message":commentBox.val()})
+
+    commentBox.val("");
+    alert("Cool. We'll maybe read that at some point.")
 }
