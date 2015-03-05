@@ -87,9 +87,6 @@ viz.append('g')
     .attr('class','y axis')
     .call(yAxis);
 
-var all_colors = ["color1","color2","color3","color4","color5"].reverse();
-var available_colors = all_colors.slice(0);
-
 var key_div = d3.select('#yearlist');
 
 var num_selected = 0;
@@ -145,6 +142,25 @@ function ready(error, data, over, averages) {
         .exit().remove()
     };
 
+    function selectyear(year) {
+        var selectline = viz.selectAll('.selected-line')
+            .data([data[year]])
+            .enter().append('g')
+            .attr('class','select selected-line')
+        selectline.append('path')
+            .attr('d',line('TMAX'))
+            .attr('class','tmax')
+        selectline.append('path')
+            .attr('d',line('TMIN'))
+            .attr('class','tmin')
+    }
+
+    function unselect_all_years() {
+        viz.selectAll('.select')
+            .data([])
+            .exit().remove()
+    }
+
     years = viz.selectAll('.year')
         .data(data_array)
         .enter().append('g')
@@ -165,7 +181,7 @@ function ready(error, data, over, averages) {
         .data(year_list)
         .enter().append('div')
         .attr('class','key-year')
-    .attr('data-year',function(d){return d;})
+        .attr('data-year',function(d){return d;})
         .html(function(d){return d;})
         .on('mouseenter',hoveryear)
         .on('mouseleave',unhoveryear)
@@ -176,36 +192,21 @@ function ready(error, data, over, averages) {
 
             // regardless, remove any existing selected classes
             $('.selected-box').removeClass('selected-box');
-            $('.selected-line').removeClass('selected-line');
+            d3.select('.selected-line').classed({'selected-line':false});
+            unselect_all_years();
 
             if(!toggle) {
                 // add class to this box
                 $(this).addClass('selected-box');
 
-                // add class to correct line
-
+                // draw selected line
+                selectyear(year);
             }
         })
 
     makeGradient();
 
     $('#comment-submit').on('click', postComment);
-}
-
-function addUniqueColor(box, line) {
-    var color = available_colors.pop();
-
-    d3.select(box).classed(color, true);
-    d3.select(line).classed(color, true);
-}
-function recycleColor(box, line) {
-    for(var i=0; i<all_colors.length; i++) {
-        if(d3.select(box).classed(all_colors[i])){
-            d3.select(box).classed(all_colors[i], false);
-            d3.select(line).classed(all_colors[i], false);
-            available_colors.push(all_colors[i]);
-        }
-    }
 }
 
 function makeGradient() {

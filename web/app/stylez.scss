@@ -1,4 +1,6 @@
 $light-gray: #e0e0e0;
+$selected-color: limegreen;
+
 body {
   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
@@ -21,7 +23,8 @@ rect.hovered-over {
 }
 .selected-line > path {
   &.tmax, &.tmin {
-    stroke: red;
+    stroke: $selected-color;
+    stroke-width: 2px;
   }
 }
 #yearlist {
@@ -140,18 +143,6 @@ line#line_of_salvation {
   stroke-width: 5px;
   stroke-dasharray: 10, 10;
 }
-
-$selected-color: fuchsia;
-
-.selected-line {
-  > path {
-    &.temparea {
-      stroke: $selected-color;
-      stroke-width: 2px;
-    }
-  }
-}
-
 
 .selected-box {
   background: $selected-color;
