@@ -83,8 +83,6 @@ viz.append('g')
     .attr('class','y axis')
     .call(yAxis);
 
-var all_colors = ["color1","color2","color3","color4","color5"].reverse();
-var available_colors = all_colors.slice(0);
 var key_div = d3.select('#yearlist');
 var num_selected = 0;
 
@@ -103,6 +101,25 @@ function ready(error, data, over, averages) {
     dailies = averages;
 
     var year_list = d3.keys(data).map(function(d){return +d}).reverse()
+
+    function selectyear(year) {
+        var selectline = viz.selectAll('.selected-line')
+            .data([data[year]])
+            .enter().append('g')
+            .attr('class','select selected-line')
+        selectline.append('path')
+            .attr('d',line('TMAX'))
+            .attr('class','tmax')
+        selectline.append('path')
+            .attr('d',line('TMIN'))
+            .attr('class','tmin')
+    }
+
+    function unselect_all_years() {
+        viz.selectAll('.select')
+            .data([])
+            .exit().remove()
+    }
 
     years = viz.selectAll('.year')
         .data(data_array)
@@ -124,45 +141,27 @@ function ready(error, data, over, averages) {
         .data(year_list)
         .enter().append('div')
         .attr('class','key-year')
-    .attr('data-year',function(d){return d;})
+        .attr('data-year',function(d){return d;})
         .html(function(d){return d;})
-    .on('mouseenter',hoveryear)
-    .on('mouseleave',unhoveryear)
+        .on('mouseenter',hoveryear)
+        .on('mouseleave',unhoveryear)
         .on("click", function(year, index) {
-            if($(this).hasClass('selected-box')) {
-                num_selected -= 1;
+            // if the user is just clicking on the already selected
+            // thing, they want to deselect it.
+            var toggle = $(this).hasClass('selected-box');
+
+            // regardless, remove any existing selected classes
+            $('.selected-box').removeClass('selected-box');
+            d3.select('.selected-line').classed({'selected-line':false});
+            unselect_all_years();
+
+            if(!toggle) {
+                // add class to this box
+                $(this).addClass('selected-box');
+
+                // draw selected line
+                selectyear(year);
             }
-            else {
-                num_selected += 1;
-            }
-            if(num_selected <= 5) {
-                var lineclass = ".year-" + year;
-
-                console.log(d3.select(this));
-
-                if($(this).hasClass('selected-box')) {
-                    console.log('remove color');
-                    recycleColor(this, lineclass);
-                }
-                else {
-                    console.log('add color');
-                    addUniqueColor(this, lineclass);
-                }
-
-                $(this).toggleClass('selected-box');
-                // toggles the class depending on whether it's selected or not
-
-                var yearline = d3.select(lineclass);
-                yearline.classed('selected-line',
-                                 !yearline.classed('selected-line'));
-            }
-            else {
-                num_selected -= 1;
-                alert('Cut it out, Captain Clickhappy. '+
-                      'You can only select 5 years at a time.');
-            }
-            console.log('selected', num_selected);
-
         })
 
     makeGradient();
@@ -207,21 +206,6 @@ function ready(error, data, over, averages) {
     };
 
 
-}
-
-function addUniqueColor(box, line) {
-    var color = available_colors.pop();
-    d3.select(box).classed(color, true);
-    d3.select(line).classed(color, true);
-}
-function recycleColor(box, line) {
-    for(var i=0; i<all_colors.length; i++) {
-        if(d3.select(box).classed(all_colors[i])){
-            d3.select(box).classed(all_colors[i], false);
-            d3.select(line).classed(all_colors[i], false);
-            available_colors.push(all_colors[i]);
-        }
-    }
 }
 
 function makeGradient() {
