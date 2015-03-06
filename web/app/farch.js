@@ -5,13 +5,12 @@ var margin = {top:10, right: 0, bottom: 50, left:40},
     height = 400 - margin.top - margin.bottom,
     startDate = new Date(2015,0,1),
     endDate = new Date(2015,5,1),
-    // startAge = 20,
-    // endAge = 80,
     y = d3.scale.linear().range([height,0]).domain([-30,100]),
-    dateme = d3.time.scale().domain([startDate,endDate]).range([1,151]),
-    x = d3.time.scale().domain([startDate,endDate]).range([0,width]);
-    // years = d3.range(startYear, endYear);
+    x = d3.time.scale().domain([startDate,endDate]).range([0,width]),
+    dateme = d3.time.scale().domain([startDate,endDate]).range([1,151]);
 
+var nice_thresh, not_over_thresh;
+var tolerance = 1;
 
 var viz = d3.select("#viz")
     .append("svg:svg")
@@ -55,10 +54,7 @@ function area() {
             tm = parseFloat(d["TMIN"])
             return y(tm);
         });
-
-
 }
-
 
 // month axis http://bl.ocks.org/mbostock/1849162
 var xAxis = d3.svg.axis()
@@ -89,61 +85,24 @@ viz.append('g')
 
 var all_colors = ["color1","color2","color3","color4","color5"].reverse();
 var available_colors = all_colors.slice(0);
-
 var key_div = d3.select('#yearlist');
-
 var num_selected = 0;
+
+//console goodness part 1
 var whenit;
-var buddy; // so's you can see the data in the console
+var buddy; 
 var dailies;
+
 function ready(error, data, over, averages) {
 
     data_array = d3.values(data);
+
+    // console goodness part 2
     buddy = data;
     whenit = over;
     dailies = averages;
 
     var year_list = d3.keys(data).map(function(d){return +d}).reverse()
-    // year_list.reverse();
-    // console.log(year_list);
-
-    function whenover(year){
-    tolerance = 1;
-    fuck = new Date(over[year][tolerance]);
-    dateover = new Date(2015,fuck.getMonth(),fuck.getDay())
-    return dateover;
-    }
-
-    function hoveryear() {
-    year = $(this).data('year');
-    var hoverline = viz.selectAll('.hovered-line')
-        .data([data[year]])
-        .enter().append('g')
-        .attr('class','hover hovered-line')
-    hoverline.append('path')
-        .attr('d',line('TMAX'))
-        .attr('class','tmax')
-    hoverline.append('path')
-        .attr('d',line('TMIN'))
-        .attr('class','tmin')
-    dateover = whenover(year);
-    // console.log(year)
-    // console.log(dateover)
-    viz.append('rect')
-        .attr('x',x(dateover))
-        .attr('y',0)
-        .attr('width',width-x(dateover))
-        .attr('height',height)
-        .attr('class','hover hovered-over')
-
-    };
-
-    function unhoveryear() {
-    year = $(this).data('year');
-    viz.selectAll('.hover')
-        .data([])
-        .exit().remove()
-    };
 
     years = viz.selectAll('.year')
         .data(data_array)
@@ -209,6 +168,45 @@ function ready(error, data, over, averages) {
     makeGradient();
 
     $('#comment-submit').on('click', postComment);
+    function whenover(year){
+
+    fuck = new Date(over[year][tolerance]);
+    dateover = new Date(2015,fuck.getMonth(),fuck.getDay())
+    return dateover;
+    }
+
+    function hoveryear() {
+    year = $(this).data('year');
+    var hoverline = viz.selectAll('.hovered-line')
+        .data([data[year]])
+        .enter().append('g')
+        .attr('class','hover hovered-line')
+    hoverline.append('path')
+        .attr('d',line('TMAX'))
+        .attr('class','tmax')
+    hoverline.append('path')
+        .attr('d',line('TMIN'))
+        .attr('class','tmin')
+    dateover = whenover(year);
+    // console.log(year)
+    // console.log(dateover)
+    viz.append('rect')
+        .attr('x',x(dateover))
+        .attr('y',0)
+        .attr('width',width-x(dateover))
+        .attr('height',height)
+        .attr('class','hover hovered-over')
+
+    };
+
+    function unhoveryear() {
+    year = $(this).data('year');
+    viz.selectAll('.hover')
+        .data([])
+        .exit().remove()
+    };
+
+
 }
 
 function addUniqueColor(box, line) {
@@ -255,4 +253,114 @@ function postComment() {
 
     commentBox.val("");
     alert("Cool. We'll maybe read that at some point.")
+}
+
+function niceDaysPerMonth(){
+    //mean nice days inverse month
+    var my = d3.nest()
+	.key(function (d) {return d.month+'_'+d.year})
+	//.key(function (d) {return d.year})
+	.rollup(function (d) {
+	    c = d3.sum(d,function(g){
+		return g.is_nice;
+	    });
+	    x = d3.max(d, function(g){
+		return g.TMAX;
+	    });
+	    n = d3.min(d, function(g){
+		return g.TMIN;
+	    });
+	    mx = d3.mean(d,function(g){
+		return g.TMAX;
+	    });
+	    mn = d3.mean(d,function(g){
+		return g.TMIN;
+	    });
+
+	    return {
+		month:d[0].month,
+		year:d[0].year,
+		nice_day_count: c,
+		highest_high: x,
+		lowest_low: n,
+		average_high: trunc(mx,1),
+		average_low: trunc(mn,1)
+	    }
+	})
+	.entries(d3.merge(d3.values(buddy)))
+
+
+    var mo = d3.nest()
+	.key(function(d){return d.values.month})
+	.rollup(function (d) {
+    	    goods = d3.sum(d,function(g){
+    		return g.values.nice_day_count;
+    	    })
+    	    exten = d3.extent(d,function(g){
+    		return g.values.nice_day_count;
+    	    });
+	    hhh = d3.max(d,function(g){
+		return g.values.highest_high;
+	    });
+	    exah = d3.extent(d,function(g){
+		return g.values.average_high;
+	    });
+	    lll = d3.min(d,function(g){
+		return g.values.lowest_low;
+	    });
+	    exal = d3.extent(d,function(g){
+		return g.values.average_low;
+	    });
+	    var raw = []
+	    for (y in d) {
+	    	raw.push(d[y].values);
+	    }
+    	    return {
+    		total_nice_days: goods,
+    		mean_nice_days: trunc(goods/d.length,1),
+    		min_nice_days: exten[0],
+    		max_nice_days: exten[1],
+		highest_highest_high: hhh,
+		lowest_average_high: exah[0],
+		highest_average_high: exah[1],
+		lowest_average_low: exal[0],
+		highest_average_low: exal[1],
+		lowest_lowest_low: lll,
+		raw:raw
+	    }
+    	})
+    
+    	.entries(my)
+
+    var mz = d3.nest().key(function(d){return d.values.year})
+	.rollup(function(d) {
+	    return d.map(function(g){
+		return g.values;
+	    }) 
+	})
+	.entries(my)
+
+
+    mz.forEach(function(d){
+	console.log('d',d);
+	ytnd = d3.sum(d,function(g){
+	    console.log('g',g);
+	    ndc = g.values.nice_day_count;
+	    console.log('ndc',ndc);
+	    return ndc;
+	});
+	console.log('ytnd',ytnd)
+	d['year_total_nice_days'] = ytnd
+    })
+
+//	.entries(d3.merge(d3.values(buddy)))
+//	.entries(d3.merge(d3.values(buddy)))
+    return [my,mo,mz];
+}
+
+
+
+function trunc(num,places){
+    p = Math.pow(10,places)
+    return Math.round(num*p)/p
 }
