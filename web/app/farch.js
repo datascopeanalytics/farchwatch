@@ -182,33 +182,34 @@ function ready(error, data, over, averages) {
 
     $('#comment-submit').on('click', postComment);
     function whenover(year){
-	fuck = new Date(over[year][tolerance]);
+	console.log(over[year][tolerance])
+	fuck = new Date(over[year][tolerance]+' 00:00');
+	console.log(fuck)
 	dateover = new Date(2015,fuck.getMonth(),fuck.getDate())
+	console.log(dateover)
 	return dateover;
     }
 
     function hoveryear() {
-    year = $(this).data('year');
-    var hoverline = viz.selectAll('.hovered-line')
-        .data([data[year]])
-        .enter().append('g')
-        .attr('class','hover hovered-line')
-    hoverline.append('path')
-        .attr('d',line('TMAX'))
-        .attr('class','tmax')
-    hoverline.append('path')
-        .attr('d',line('TMIN'))
-        .attr('class','tmin')
-    dateover = whenover(year);
-    // console.log(year)
-    // console.log(dateover)
-    viz.append('rect')
-        .attr('x',x(dateover))
-        .attr('y',0)
-        .attr('width',width-x(dateover))
-        .attr('height',height)
-        .attr('class','hover hovered-over')
-
+	year = $(this).data('year');
+	var hoverline = viz.selectAll('.hovered-line')
+            .data([data[year]])
+            .enter().append('g')
+            .attr('class','hover hovered-line')
+	hoverline.append('path')
+            .attr('d',line('TMAX'))
+            .attr('class','tmax')
+	hoverline.append('path')
+            .attr('d',line('TMIN'))
+            .attr('class','tmin')
+	dateover = whenover(year);
+	viz.append('rect')
+            .attr('x',x(dateover))
+            .attr('y',0)
+            .attr('width',width-x(dateover))
+            .attr('height',height)
+            .attr('class','hover hovered-over')
+	
     };
 
     function unhoveryear() {
