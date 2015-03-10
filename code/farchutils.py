@@ -91,7 +91,7 @@ def clean_dataframe(df,columns):
     df = make_dates_dates(df.loc[:,columns])
     df = convert_to_farenheit(df)
     df = add_date_cols(df)
-    df = midway_readings_only(df)
+    df = remove_botanical_garden(df)
     df = make_cols_human_readable(df)
     df = nans_to_zeroes(df)
 
