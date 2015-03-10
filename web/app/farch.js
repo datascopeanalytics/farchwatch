@@ -1,6 +1,6 @@
 Firebase.goOffline();
 
-var margin = {top:10, right: 0, bottom: 50, left:40},
+var margin = {top:10, right: 1, bottom: 50, left:40},
     width = $("#viz").width() - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
     startDate = new Date(2015,0,1),
@@ -64,6 +64,10 @@ var xAxis = d3.svg.axis()
     .tickSize(16, 0)
     .tickFormat(d3.time.format("%B"));
 
+if(width < 500) {
+    xAxis.tickFormat(d3.time.format("%b"));
+}
+
 var yAxis = d3.svg.axis()
     .scale(y)
     .orient("left")
@@ -88,7 +92,7 @@ var num_selected = 0;
 
 //console goodness part 1
 var whenit;
-var buddy; 
+var buddy;
 var dailies;
 
 function ready(error, data, over, averages) {
@@ -256,99 +260,99 @@ function postComment() {
 function niceDaysPerMonth(){
     //mean nice days inverse month
     var my = d3.nest()
-	.key(function (d) {return d.month+'_'+d.year})
-	//.key(function (d) {return d.year})
-	.rollup(function (d) {
-	    c = d3.sum(d,function(g){
-		return g.is_nice;
-	    });
-	    x = d3.max(d, function(g){
-		return g.TMAX;
-	    });
-	    n = d3.min(d, function(g){
-		return g.TMIN;
-	    });
-	    mx = d3.mean(d,function(g){
-		return g.TMAX;
-	    });
-	    mn = d3.mean(d,function(g){
-		return g.TMIN;
-	    });
+    .key(function (d) {return d.month+'_'+d.year})
+    //.key(function (d) {return d.year})
+    .rollup(function (d) {
+        c = d3.sum(d,function(g){
+        return g.is_nice;
+        });
+        x = d3.max(d, function(g){
+        return g.TMAX;
+        });
+        n = d3.min(d, function(g){
+        return g.TMIN;
+        });
+        mx = d3.mean(d,function(g){
+        return g.TMAX;
+        });
+        mn = d3.mean(d,function(g){
+        return g.TMIN;
+        });
 
-	    return {
-		month:d[0].month,
-		year:d[0].year,
-		nice_day_count: c,
-		highest_high: x,
-		lowest_low: n,
-		average_high: trunc(mx,1),
-		average_low: trunc(mn,1)
-	    }
-	})
-	.entries(d3.merge(d3.values(buddy)))
+        return {
+        month:d[0].month,
+        year:d[0].year,
+        nice_day_count: c,
+        highest_high: x,
+        lowest_low: n,
+        average_high: trunc(mx,1),
+        average_low: trunc(mn,1)
+        }
+    })
+    .entries(d3.merge(d3.values(buddy)))
 
 
     var mo = d3.nest()
-	.key(function(d){return d.values.month})
-	.rollup(function (d) {
-    	    goods = d3.sum(d,function(g){
-    		return g.values.nice_day_count;
-    	    })
-    	    exten = d3.extent(d,function(g){
-    		return g.values.nice_day_count;
-    	    });
-	    hhh = d3.max(d,function(g){
-		return g.values.highest_high;
-	    });
-	    exah = d3.extent(d,function(g){
-		return g.values.average_high;
-	    });
-	    lll = d3.min(d,function(g){
-		return g.values.lowest_low;
-	    });
-	    exal = d3.extent(d,function(g){
-		return g.values.average_low;
-	    });
-	    var raw = []
-	    for (y in d) {
-	    	raw.push(d[y].values);
-	    }
-    	    return {
-    		total_nice_days: goods,
-    		mean_nice_days: trunc(goods/d.length,1),
-    		min_nice_days: exten[0],
-    		max_nice_days: exten[1],
-		highest_highest_high: hhh,
-		lowest_average_high: exah[0],
-		highest_average_high: exah[1],
-		lowest_average_low: exal[0],
-		highest_average_low: exal[1],
-		lowest_lowest_low: lll,
-		raw:raw
-	    }
-    	})
-    
-    	.entries(my)
+    .key(function(d){return d.values.month})
+    .rollup(function (d) {
+            goods = d3.sum(d,function(g){
+            return g.values.nice_day_count;
+            })
+            exten = d3.extent(d,function(g){
+            return g.values.nice_day_count;
+            });
+        hhh = d3.max(d,function(g){
+        return g.values.highest_high;
+        });
+        exah = d3.extent(d,function(g){
+        return g.values.average_high;
+        });
+        lll = d3.min(d,function(g){
+        return g.values.lowest_low;
+        });
+        exal = d3.extent(d,function(g){
+        return g.values.average_low;
+        });
+        var raw = []
+        for (y in d) {
+            raw.push(d[y].values);
+        }
+            return {
+            total_nice_days: goods,
+            mean_nice_days: trunc(goods/d.length,1),
+            min_nice_days: exten[0],
+            max_nice_days: exten[1],
+        highest_highest_high: hhh,
+        lowest_average_high: exah[0],
+        highest_average_high: exah[1],
+        lowest_average_low: exal[0],
+        highest_average_low: exal[1],
+        lowest_lowest_low: lll,
+        raw:raw
+        }
+        })
+
+        .entries(my)
 
     var mz = d3.nest().key(function(d){return d.values.year})
-	.rollup(function(d) {
-	    return d.map(function(g){
-		return g.values;
-	    }) 
-	})
-	.entries(my)
+    .rollup(function(d) {
+        return d.map(function(g){
+        return g.values;
+        })
+    })
+    .entries(my)
 
 
     mz.forEach(function(d){
-	console.log('d',d);
-	ytnd = d3.sum(d,function(g){
-	    console.log('g',g);
-	    ndc = g.values.nice_day_count;
-	    console.log('ndc',ndc);
-	    return ndc;
-	});
-	console.log('ytnd',ytnd)
-	d['year_total_nice_days'] = ytnd
+    console.log('d',d);
+    ytnd = d3.sum(d,function(g){
+        console.log('g',g);
+        ndc = g.values.nice_day_count;
+        console.log('ndc',ndc);
+        return ndc;
+    });
+    console.log('ytnd',ytnd)
+    d['year_total_nice_days'] = ytnd
     })
 
 //	.entries(d3.merge(d3.values(buddy)))
