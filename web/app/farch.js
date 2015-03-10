@@ -3,8 +3,8 @@ Firebase.goOffline();
 var margin = {top:10, right: 1, bottom: 50, left:40},
     width = $("#viz").width() - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
-    startDate = new Date(2015,0,1),
-    endDate = new Date(2015,5,1),
+    startDate = new Date(2015,0,1,0,0),
+    endDate = new Date(2015,5,1,0,0),
     y = d3.scale.linear().range([height,0]).domain([-30,100]),
     x = d3.time.scale().domain([startDate,endDate]).range([0,width]),
     dateme = d3.time.scale().domain([startDate,endDate]).range([1,151]);
@@ -34,7 +34,11 @@ queue()
 function line(feat) {
     return d3.svg.line()
         .x(function(d) {
-            return x(dateme.invert(d.day));
+	    date = dateme.invert(d.day)
+	    date.setHours(0)
+	    date.setMinutes(0)
+	    date.setSeconds(0)
+            return x(date);
         })
         .y(function(d) {
             tm = parseFloat(d[feat])
@@ -44,7 +48,11 @@ function line(feat) {
 function area() {
     return d3.svg.area()
         .x(function(d) {
-            return x(dateme.invert(d.day));
+	    date = dateme.invert(d.day)
+	    date.setHours(0)
+	    date.setMinutes(0)
+	    date.setSeconds(0)
+            return x(date);
         })
         .y0(function(d) {
             tm = parseFloat(d["TMAX"])
@@ -185,7 +193,7 @@ function ready(error, data, over, averages) {
 	// console.log(over[year][tolerance])
 	fuck = new Date(over[year][tolerance]+' 00:00');
 	// console.log(fuck)
-	dateover = new Date(2015,fuck.getMonth(),fuck.getDate())
+	dateover = new Date(2015,fuck.getMonth(),fuck.getDate(),0,0)
 	// console.log(dateover)
 	return dateover;
     }
