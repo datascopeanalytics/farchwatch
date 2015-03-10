@@ -10,7 +10,7 @@ var margin = {top:10, right: 0, bottom: 50, left:40},
     dateme = d3.time.scale().domain([startDate,endDate]).range([1,151]);
 
 var nice_thresh, not_over_thresh;
-var tolerance = 1;
+var tolerance = 0;
 
 var viz = d3.select("#viz")
     .append("svg:svg")
@@ -131,10 +131,20 @@ function ready(error, data, over, averages) {
 
     viz.append('line')
         .attr('id','line_of_salvation')
-        .attr('x1',x(startDate))
+        .attr('class','tropics')
+	.attr('x1',x(startDate))
         .attr('x2',x(endDate))
         .attr('y1',y(60))
         .attr('y2',y(60));
+
+    viz.append('line')
+	.attr('id','line_of_disappointment')
+	.attr('class','tropics')
+	.attr('x1',x(startDate))
+        .attr('x2',x(endDate))
+	.attr('y1',y(50))
+	.attr('y2',y(50));
+    
 
     // add years to scrollbox;
     key_div.selectAll(".yearbox")
@@ -168,10 +178,14 @@ function ready(error, data, over, averages) {
 
     $('#comment-submit').on('click', postComment);
     function whenover(year){
-
-    fuck = new Date(over[year][tolerance]);
-    dateover = new Date(2015,fuck.getMonth(),fuck.getDay())
-    return dateover;
+	fuck = new Date(over[year][tolerance]);
+	console.log(over[year])
+	console.log('fuck',fuck);
+	console.log('fuck.getMonth()',fuck.getMonth())
+	console.log('fuck.getDate()',fuck.getDate())
+	dateover = new Date(2015,fuck.getMonth(),fuck.getDate())
+	console.log('dateover',dateover);
+	return dateover;
     }
 
     function hoveryear() {
