@@ -182,11 +182,11 @@ function ready(error, data, over, averages) {
 
     $('#comment-submit').on('click', postComment);
     function whenover(year){
-	console.log(over[year][tolerance])
+	// console.log(over[year][tolerance])
 	fuck = new Date(over[year][tolerance]+' 00:00');
-	console.log(fuck)
+	// console.log(fuck)
 	dateover = new Date(2015,fuck.getMonth(),fuck.getDate())
-	console.log(dateover)
+	// console.log(dateover)
 	return dateover;
     }
 
