@@ -127,7 +127,7 @@ path.temparea {
 /*   opacity:0.5; */
 /* } */
 
-/* line#line_of_salvation { */
+/* line.tropics { */
 /*   stroke: cyan; */
 /*   stroke-width: 2px; */
 /*   stroke-dasharray: 5 3; */
@@ -137,9 +137,9 @@ rect.background{
   fill: url(#temperature-gradient);
 }
 
-line#line_of_salvation {
+line.tropics {
   stroke: white;
-  stroke-width: 5px;
+  stroke-width: 3px;
   stroke-dasharray: 10, 10;
 }
 

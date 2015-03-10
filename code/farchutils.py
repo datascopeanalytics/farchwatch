@@ -58,6 +58,10 @@ def add_date_cols(df):
 
     return df
 
+def midway_readings_only(df):
+    stations = df.STATION_NAME.unique()
+    return df[df.loc[:,'STATION_NAME'] == stations[0]]
+
 def remove_botanical_garden(df):
     stations = df.STATION_NAME.unique()
     return df[df.loc[:,'STATION_NAME'] != stations[2]]
@@ -87,7 +91,7 @@ def clean_dataframe(df,columns):
     df = make_dates_dates(df.loc[:,columns])
     df = convert_to_farenheit(df)
     df = add_date_cols(df)
-    df = remove_botanical_garden(df)
+    df = midway_readings_only(df)
     df = make_cols_human_readable(df)
     df = nans_to_zeroes(df)
 
@@ -209,7 +213,6 @@ def add_nice_and_over(df,nice,not_over,tol):
 
     df.loc[:,'is_nice'] = (df.loc[:,'TMAX'] > nice) & (df.loc[:,'PRCP'] < 10)
     df.loc[:,'not_over'] = df.loc[:,'TMAX'] < not_over
-    print '3. TMAX dtype',df.TMAX.dtype
 
     return df
 
@@ -230,14 +233,11 @@ if __name__ == '__main__':
     TOLERANCE = 1
     ##
     df_with_nice_and_over = add_nice_and_over(df_by_date,NICE,NOT_OVER,TOLERANCE)
-    print '1. TMAX dtype',df_with_nice_and_over.TMAX.dtype
 
     # data json 1: data_by_year.json
     yearly_dict = create_yearly_dict_from_df(df_with_nice_and_over)
-    print '5. TMAX dtype',df_with_nice_and_over.TMAX.dtype
     with open(dirname+'/data_by_year.json','w') as outfile1:
         json.dump(yearly_dict,outfile1)
-    print '4. TMAX dtype',df_with_nice_and_over.TMAX.dtype
 
     # data json 2: when_it_be_over.json
     over_dict = when_is_it_over(yearly_dict,TOLERANCE)
@@ -252,11 +252,8 @@ if __name__ == '__main__':
     # data json 3: daily_averages.json
 
 
-    print '2. TMAX dtype',df_with_nice_and_over.TMAX.dtype
     daily_averages_df = df_with_nice_and_over.groupby('day').mean()
-    print daily_averages_df.head()
     daily_averages = dict_me(daily_averages_df)
-    print daily_averages[:5]
     with open (dirname+'/daily_averages.json','w') as outfile3:
         json.dump(daily_averages,outfile3)
 
