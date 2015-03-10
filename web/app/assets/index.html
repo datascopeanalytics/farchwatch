@@ -7,9 +7,6 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
-
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
@@ -49,7 +46,7 @@
       <div id="tagline-container" class="row">
         <span id="tagline">
           Abandon all hope, ye who enter Farch.
-          <a>(wtf is farch?)</a>
+          <a data-toggle="modal" data-target="#myModal">(wtf is farch?)</a>
         </span>
       </div>
       <div class="row">
@@ -89,18 +86,30 @@
           <a href="http://github.com/datascopeanalytics/farchwatch">It's here.</a>
         </p>
       </div>
-      <!-- You've got to hide your love away... -->
-      <!--   <div id="definition" class="col-md-3"> -->
-      <!--     <span id="farchword">Farch</span> -->
-      <!--     <span id="part-of-speech">noun</span> -->
-      <!--     <span id="def">the period of time when other parts of the -->
-      <!--       continental United States experience springtime while -->
-      <!--       Chicago experiences prolonged winter. Typically begins in -->
-      <!--       late February or early March.</span> -->
-      <!--     <div id="example">"Poor Maria just moved to Chicago&mdash; -->
-      <!--       she thinks it will get warm next month. She hasn't -->
-      <!--       experienced Farch before."</div> -->
-      <!--   </div> -->
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div id="definition">
+            <span id="farchword">Farch</span>
+            <span id="part-of-speech">noun</span>
+            <span id="def">the period of time when other parts of the
+              continental United States experience springtime while
+              Chicago experiences prolonged winter. Typically begins in
+              late February or early March.</span>
+            <div id="example">"Poor Maria just moved to Chicago&mdash;
+              she thinks it will get warm next month. She hasn't
+              experienced Farch before."</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Got it.
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <script type="text/javascript" src="app.js"></script>
   </body>

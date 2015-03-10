@@ -85,7 +85,6 @@ h3 {
     font-style: italic;
   }
   padding: 1em;
-  background: $light-gray;
 }
 
 
@@ -181,4 +180,23 @@ textarea {
   background-color: black;
   border-radius: 0px;
   margin-bottom: 1em;
+}
+
+.modal-content {
+  border-radius: 0px;
+
+}
+
+.btn {
+  background: blue;
+  color: white;
+  border: 0px;
+  border-radius: 0px;
+  &:hover {
+    background: black;
+    color: white;
+  }
+}
+a {
+  cursor: pointer;
 }
