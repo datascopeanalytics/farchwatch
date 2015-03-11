@@ -106,7 +106,7 @@ function dopecast(error, tenday){
 	.attr('class',function (d){
 	    return 'conditions-icon '+ 'con_'+d.icon
 	})
-
+	.style('opacity','0.5')
 
     var hilo = hopecast.append('g')
 	.attr('transform','translate(' + 2*padding + ',' + (dayheight*3/5) + ')')
