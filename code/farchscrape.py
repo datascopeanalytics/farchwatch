@@ -1,6 +1,28 @@
-import requests
-import pprint; pp = pprint.PrettyPrinter()
+import sys
 import json
+
+import pprint; pp = pprint.PrettyPrinter()
+import requests
+
+CONDITIONS_KEY = {
+    'Clear': 3,
+    'Sunny': 3,
+    'Mostly Sunny': 3,
+    'Partly Cloudy': 3,
+    'Mostly Cloudy': 2,
+    'Cloudy': 2,
+    'Fog': 2,
+    'Hazy': 2,
+    'Partly Sunny': 2,
+    'Overcast': 2,
+    'Chance of': 1,
+    'Flurries': 1,
+    'Sleet':1,
+    'Snow': 1,
+    'Thunderstorms': 1,
+    'Tstorms': 1,
+    'T-storms': 1,
+}
 
 def get_yesterday():
     r = requests.get("http://api.wunderground.com/api/1498e6b240ba15f0/yesterday/q/IL/Chicago.json")
@@ -47,7 +69,8 @@ def get_forecast():
     for day in data['forecast']['simpleforecast']['forecastday']:
         datapoint = {}
         #potentially relevant fields:
-        datapoint['day'] = int(day["date"]["day"])
+        datapoint['weekday'] = day["date"]["weekday_short"]
+        datapoint['date'] = day["date"]["day"]
         datapoint['month'] = int(day["date"]["month"])
         datapoint['year'] = int(day["date"]["year"])
         datapoint['high'] = float(day["high"]["fahrenheit"])
@@ -61,10 +84,68 @@ def get_forecast():
         # pp.pprint(datapoint)
 
         #TODO.. we also need to do something with these datapoints
-        
+        datapoint['outlook'] = rate_datapoint(datapoint)
+
+
         forecast.append(datapoint)
     return forecast
+
+
+def rate_datapoint(datapoint):
+    high = datapoint['high']
+    conditions = enumerate_conditions(datapoint['conditions'])
+
+    if not conditions: 
+        return 'FAIL'
+
+    if high < 33:
+        if conditions < 2:
+            return 'ZOMG'
+        elif conditions < 3: 
+            return 'UGH'
+        else:
+            return 'BRR'
+
+    elif high < 50:
+        if conditions < 2: 
+            return 'YUCK'
+        elif conditions < 3:
+            return 'UGH'
+        else:
+            return 'MEH'
+
+    elif high < 60:
+        if conditions < 2:
+            return 'UGH'
+        elif conditions < 3:
+            return 'MEH'
+        else:
+            return 'AIGHT'
+            
+    else:
+        if conditions < 2:
+            return 'MEH'
+        elif conditions < 3:
+            return 'AIGHT'
+        else:
+            return 'NICE!'
+
+def enumerate_conditions(cond):
+    if cond.startswith('Chance of'):
+        cond = 'Chance of'
+    
+    try:
+        conditions = CONDITIONS_KEY[cond]
+    except KeyError: 
+        print >> sys.stderr, '"%s" not found, returning FAIL' % cond
+        conditions = 0
+
+    return conditions
+
 
 forecast = get_forecast()
 with open('../web/app/assets/forecast.json','w') as outfile:
     json.dump(forecast,outfile)
+
+
+

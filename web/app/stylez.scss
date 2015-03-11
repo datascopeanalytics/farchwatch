@@ -187,6 +187,25 @@ textarea {
 
 }
 
+#hopecast {
+  text {
+    font-weight: bold;
+    fill: white;
+  } 
+  .farchlook {
+    rect {
+      fill: blue;
+    }
+    text {
+      font-style: italic;
+      font-size: larger;
+      fill: red;
+      stroke: coral;
+    }
+  }
+
+}
+
 .btn {
   background: blue;
   color: white;
