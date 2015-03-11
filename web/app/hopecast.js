@@ -1,7 +1,7 @@
 
-var today = new Date()
-var tenday = d3.time.day.range(today,d3.time.day.offset(today,10))
-console.log(tenday)
+var today = d3.time.day.floor(new Date())
+var enddate = d3.time.day.offset(today,10)
+var tenday = d3.time.day.range(today,enddate)
 var padding = 5
 var hopewidth = $('#hopecast-container').width()
 //var hopeheight = $('#hopecast-container').height()
