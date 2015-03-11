@@ -54,15 +54,14 @@ function dopecast(error, tenday){
 
     
     var day_header = hopecast.append('g')
-	.attr('transform','translate('+padding/2+','+padding/2+')')
 	.attr('class','day-header')
     
     day_header.append('rect')
-	.attr('height',dayheight/5-padding)
-	.attr('width',daywidth-padding)
+	.attr('height',dayheight/5)
+	.attr('width',daywidth)
     
     day_header.append('text')
-	.attr('x',(daywidth-padding)/2)
+	.attr('x',daywidth/2)
 	.attr('y',daywidth/10)
 	.attr('dy','0.5em')
 	.attr('text-anchor','middle')
@@ -71,15 +70,15 @@ function dopecast(error, tenday){
 	})
 
     var farchlook = hopecast.append('g')
-	.attr('transform','translate('+padding/2+','+(dayheight*3/4)+')')
+	.attr('transform','translate(0,'+(dayheight*3/4)+')')
 	.attr('class','farchlook')
 
     farchlook.append('rect')
-	.attr('width',daywidth-padding)
-	.attr('height',dayheight/4-padding/2)
+	.attr('width',daywidth)
+	.attr('height',dayheight/4)
 
     farchlook.append('text')
-	.attr('x',(daywidth-padding)/2)
+	.attr('x',daywidth/2)
 	.attr('y',dayheight/8)
 	.attr('dy','0.2em')
 	.attr('text-anchor','middle')
