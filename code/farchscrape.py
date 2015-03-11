@@ -1,5 +1,6 @@
 import requests
 import pprint; pp = pprint.PrettyPrinter()
+import json
 
 def get_yesterday():
     r = requests.get("http://api.wunderground.com/api/1498e6b240ba15f0/yesterday/q/IL/Chicago.json")
@@ -39,8 +40,9 @@ def get_yesterday():
 def get_forecast():
     r = requests.get("http://api.wunderground.com/api/1498e6b240ba15f0/forecast10day/q/IL/Chicago.json")
     data = r.json()
-    pp.pprint(data)
-
+    # pp.pprint(data)
+    forecast = []
+    
     # this is a 10 day list of days
     for day in data['forecast']['simpleforecast']['forecastday']:
         datapoint = {}
@@ -56,8 +58,13 @@ def get_forecast():
         datapoint['icon_url'] = day["icon_url"]
         datapoint['precip_prob'] = day["pop"] # -> probability of precipitation
         datapoint['precip'] = float(day["qpf_allday"]["in"])
-        pp.pprint(datapoint)
+        # pp.pprint(datapoint)
 
         #TODO.. we also need to do something with these datapoints
+        
+        forecast.append(datapoint)
+    return forecast
 
-get_forecast()
+forecast = get_forecast()
+with open('../web/app/assets/forecast.json','w') as outfile:
+    json.dump(forecast,outfile)
